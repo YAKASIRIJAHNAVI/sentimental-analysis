@@ -1,0 +1,38 @@
+from flask import Flask, request, render_template
+import joblib
+import csv
+import os
+
+app = Flask(__name__)
+model = joblib.load('model.pkl')
+vectorizer = joblib.load('vectorizer.pkl')
+history_file = 'history.csv'
+
+@app.route('/')
+def home():
+    history = []
+    if os.path.exists(history_file):
+        with open(history_file, 'r') as f:
+            reader = csv.reader(f)
+            history = list(reader)
+    return render_template('index.html', history=history)
+
+@app.route('/predict', methods=['POST'])
+def predict():
+    message = request.form['message']
+    vect = vectorizer.transform([message])
+    prediction = model.predict(vect)[0]
+
+    with open(history_file, 'a', newline='') as f:
+        writer = csv.writer(f)
+        writer.writerow([message, prediction])
+
+    history = []
+    with open(history_file, 'r') as f:
+        reader = csv.reader(f)
+        history = list(reader)
+
+    return render_template('index.html', prediction=prediction, history=history)
+
+if __name__ == '__main__':
+    app.run(debug=True)

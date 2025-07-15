@@ -1,0 +1,7 @@
+text,label
+I love this product,positive
+Worst experience ever,negative
+Amazing and useful,positive
+Very bad service,negative
+Great value,positive
+Disappointed,negative
